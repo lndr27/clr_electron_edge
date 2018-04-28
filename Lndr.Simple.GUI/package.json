@@ -1,25 +1,51 @@
 {
-  "name": "electron-quick-start",
-  "version": "1.0.0",
-  "description": "A minimal Electron application",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
-  "devDependencies": {
-    "electron": "^1.8.4"
-  },
-  "dependencies": {
-    "electron-edge-js": "^8.3.2"
-  }
+    "name": "lndr-simple-clr",
+    "version": "1.0.0",
+    "description": "Simple Electron CLR",
+    "main": "src/main.js",
+    "scripts": {
+        "start": "electron .",
+        "dist": "build"
+    },
+    "build": {
+        "appId": "SimpleClr",
+        "win": {
+            "target": "portable"
+        },
+        "extraResources": [
+            {
+                "from": "./src/resources/Lndr.Simple.CLR.dll",
+                "to": "./"
+            },
+            {
+                "from": "./src/resources/x86",
+                "to": "./x86"
+            },
+            {
+                "from": "./src/resources/x64",
+                "to": "./x64"
+            }
+        ]
+    },
+    "repository": "https://github.com/lndr27/clr_electron_edge",
+    "keywords": [
+        "Electron",
+        "Simple",
+        "CLR",
+        "Electron-edge-js",
+        "DLL",
+        "ExtraResources"
+    ],
+    "author": "Lndr27",
+    "license": "CC0-1.0",
+    "devDependencies": {
+        "electron": "^1.8.4",
+        "electron-builder": "^20.10.0"
+    },
+    "dependencies": {
+        "angular": "^1.6.10",
+        "bootstrap": "^4.1.0",
+        "electron-edge-js": "^8.3.2",
+        "jquery": "^3.3.1"
+    }
 }

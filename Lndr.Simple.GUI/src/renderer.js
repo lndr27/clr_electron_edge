@@ -4,8 +4,8 @@
 var edge = require('electron-edge-js');
 var dialog = require('electron').remote.dialog;
 
-var assemblyFile = 'Lndr.Simple.CLR.dll';
-var typeName =  'Lndr.Simple.CLR.Controllers.EventosController';
+var assemblyFile = './resources/Lndr.Simple.CLR.dll';
+var typeName = 'Lndr.Simple.CLR.Controllers.EventosController';
 
 var adicionarPacotes = edge.func({
     assemblyFile: assemblyFile,
@@ -31,7 +31,8 @@ document.getElementById('foo').addEventListener('click', () => {
 
     dialog.showOpenDialog({}, (filepaths) => {
         adicionarPacotes(filepaths, (error, result) => {
-            console.log(result);    
+            console.log(error);
+            console.log(result);
         });
     });
 });
@@ -39,6 +40,7 @@ document.getElementById('foo').addEventListener('click', () => {
 document.getElementById('bar').addEventListener('click', () => {
 
     listarEventosEmpresa(1, (error, result) => {
+        console.log(error);
         console.log(result);
     });
 });
@@ -46,6 +48,7 @@ document.getElementById('bar').addEventListener('click', () => {
 document.getElementById('baz').addEventListener('click', () => {
 
     listarEmpresas({}, (error, result) => {
+        console.log(error);
         console.log(result);
     });
 });

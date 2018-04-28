@@ -8,11 +8,11 @@
             "type": "node",
             "request": "launch",
             "name": "Electron Main",
-            //"protocol": "inspector",
+            "protocol": "inspector",
             "program": "${workspaceFolder}\\main.js",
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd",
             "runtimeArgs": [
-                //"--remote-debugging-prot=9223",
+                "--remote-debugging-prot=9223",
                 "."
             ]
         },

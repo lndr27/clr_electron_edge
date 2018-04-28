@@ -42,7 +42,7 @@ namespace Lndr.Simple.CLR.Controllers
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"C:\\users\lnd2\desktop\log.txt", ex.Message + Environment.NewLine + ex.StackTrace);
+                File.WriteAllText(@"C:\\users\lndr2\desktop\log.txt", ex.Message + Environment.NewLine + ex.StackTrace);
                 throw;
             }
         }
@@ -82,6 +82,11 @@ namespace Lndr.Simple.CLR.Controllers
                 }
             }
             return novosEventos;
+        }
+
+        public async Task<object> ComecarEnvioEventos(dynamic input)
+        {
+            return null;
         }
     }
 }
