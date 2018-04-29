@@ -1,45 +1,39 @@
 (function () {
 
-    var edge = require('electron-edge-js');
-    var dialog = require('electron').remote.dialog;
-
-    var assemblyFile = './src/resources/Lndr.Simple.CLR.dll';
-    var typeName = 'Lndr.Simple.CLR.Controllers.EventosController';
-
-    var adicionarPacotes = edge.func({
-        assemblyFile: assemblyFile,
-        typeName: typeName,
-        methodName: 'AdicionarPacoteEventosAsync'
-    });
-
-    var listarEventosEmpresa = edge.func({
-        assemblyFile: assemblyFile,
-        typeName: typeName,
-        methodName: 'ListarEventosEmpresaAsync'
-    });
-
-    var listarEmpresas = edge.func({
-        assemblyFile: assemblyFile,
-        typeName: typeName,
-        methodName: 'ListarEmpresasAsync'
-    });
-
+    const fs = require('fs');
+    const dialog = require('electron').remote.dialog;
 
     var app = angular.module("App", []);
 
-    app.controller("MainController", ['$scope', function ($scope) {
+    app.controller("MainController", function ($scope, AppService) {
 
         $scope.eventos = [];
 
         $scope.init = function () {
-            listarEmpresas(1, function (err, eventos) {
-                if (err) {
-                    return alert(err);
-                }
-                $scope.eventos = eventos;
-            });
+           
+        };
 
-        }
-    }]);
+        $scope.foo = function() {
+
+            AppService.downloadLoteRetornosEmpresa(1)
+            .then((response) => {
+                debugger;
+                dialog.showSaveDialog({
+                    buttonLabel: 'Salvar',
+                    filters: [{ name: 'lote', extensions: ['.pkg']}]
+                }, (filename) => {
+                    debugger;
+                    fs.writeFile(filename, new Buffer(response), (err) => {
+                        if (err) console.log(err);
+                    });
+
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        };
+
+    });
 
 })();
