@@ -1,0 +1,26 @@
+@keyframes rotating {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.rotating {
+    animation: rotating 2s linear infinite;
+}
+
+.rotating.lnr {
+    display: inline-block;
+}
+
+
+.lnr {
+    font-size: 1rem;
+}
+
+.container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+}

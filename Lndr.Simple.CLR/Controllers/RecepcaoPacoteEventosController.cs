@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Lndr.Simple.CLR.Controllers
@@ -34,8 +35,8 @@ namespace Lndr.Simple.CLR.Controllers
                     var arquivo = JsonConvert.DeserializeObject<ArquivoEntradaDTO>(File.ReadAllText(caminhoArquivo));
                     if (arquivo != null)
                     {
-                        this.SalvarEmpresa(arquivo.Empresa);
-                        quantidadeEventosNovos += this.SalvarEventos(arquivo.Eventos, arquivo.Empresa.Id);
+                        var idEmpresa = this.SalvarEmpresa(arquivo.Empresa);
+                        quantidadeEventosNovos += this.SalvarEventos(arquivo.Eventos, idEmpresa);
                     }
                 }
                 return new { status = "OK", quantidadeEventosNovos };
@@ -47,14 +48,15 @@ namespace Lndr.Simple.CLR.Controllers
             }
         }
 
-        private void SalvarEmpresa(Empresa empresa)
+        private int SalvarEmpresa(Empresa empresa)
         {
             var empresaRepository = new EmpresaRepository();
-            var empresaBase = empresaRepository.Get(empresa.Id);
+            var empresaBase = empresaRepository.GetByCnpj(empresa.CNPJ);
             if (empresaBase == null)
             {
-                empresaRepository.Add(empresa);
+                return empresaRepository.Add(empresa);
             }
+            return empresaBase.Id;
         }
 
         private int SalvarEventos(List<Evento> eventos, int idEmpresa)
@@ -84,9 +86,47 @@ namespace Lndr.Simple.CLR.Controllers
             return novosEventos;
         }
 
-        public async Task<object> ComecarEnvioEventos(dynamic input)
+        public async Task<object> ComecarEnvioLotesEmpresaAsync(int idEmpresa)
         {
             return null;
+        }
+
+        public async Task<object> PararEnvioLotesEmpresaAsync(int idEmpresa)
+        {
+            var certificado = SelecionarCertificadoAssinaturaArquivo();
+
+            return certificado;
+        }
+
+        public async Task<object> DownloadPacoteRetornoEmpresaAsync(int idEmpresa)
+        {            
+
+            var arquivo = File.ReadAllBytes(@"C:\\users\lndr2\desktop\teste.json");
+            return arquivo;
+        }
+
+        private static string SelecionarCertificadoAssinaturaArquivo()
+        {
+            X509Certificate2 vRetorna;
+            var oX509Cert = new X509Certificate2();
+            var store = new X509Store("MY", StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
+            var collection = store.Certificates;
+            var collection1 = collection.Find(X509FindType.FindByTimeValid, DateTime.Now, false);
+            var collection2 = collection.Find(X509FindType.FindByKeyUsage, X509KeyUsageFlags.DigitalSignature, false);
+            var scollection = X509Certificate2UI.SelectFromCollection(collection2, "Certificado(s) Digital(is) disponível(is)", "Selecione o certificado digital para uso no aplicativo", X509SelectionFlag.SingleSelection);
+
+            if (scollection.Count == 0)
+            {
+                vRetorna = null;
+            }
+            else
+            {
+                oX509Cert = scollection[0];
+                vRetorna = oX509Cert;
+            }
+
+            return vRetorna.FriendlyName;
         }
     }
 }

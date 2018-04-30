@@ -4,5 +4,6 @@ namespace Lndr.Simple.CLR.Repositories
 {
     interface IEmpresaRepository : IRepository<Empresa>
     {
+        Empresa GetByCnpj(string cnpj);
     }
 }

@@ -24,6 +24,14 @@ namespace Lndr.Simple.CLR.Repositories
             }
         }
 
+        public Empresa GetByCnpj(string cnpj)
+        {
+            using (var connection = base.GetDbConnection())
+            {
+                return connection.QueryFirst<Empresa>("SELECT * FROM Empresas WHERE CNPJ = @cnpj", new { cnpj });
+            }
+        }
+
         public int Add(Empresa empresa)
         {
             using (var connection = base.GetDbConnection())

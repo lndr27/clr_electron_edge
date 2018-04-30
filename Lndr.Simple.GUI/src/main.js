@@ -1,17 +1,22 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const path = require('path')
 const url = require('url')
 
-let mainWindow
-
+let mainWindow;
+let menuPrincipal;
 
 app.on('ready', () => {
-    // Create the browser window.
-    mainWindow = new BrowserWindow({ width: 800, height: 600 })
 
-    // and load the index.html of the app.
+    mainWindow = new BrowserWindow({ 
+        width: 950, 
+        height: 600,
+        minWidth: 950,
+        minHeight: 600,
+        frame: false
+    })
+
     mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'index.html'),
+        pathname: path.join(__dirname, 'views/index.html'),
         protocol: 'file:',
         slashes: true
     }));
@@ -20,18 +25,19 @@ app.on('ready', () => {
 
     mainWindow.on('closed', () => mainWindow = null);
 
-
-/*
-    mainWindow.setMenu(Menu.buildFromTemplate([{
+    menuPrincipal = Menu.buildFromTemplate([{
         label: "Arquivo",
-        submenu: [
-            { label: "Always on top", click: this._toggleAlwaysOnTop.bind(this) },
+        submenu: [            
+            { label: "DevTools", click: mainWindow.webContents.openDevTools },
+            { label: 'Adicionar Pacote', click: () => {} },
             { type: "separator" },
-            { label: "DevTools", click: this._toggleDevTools.bind(this) },
-            { label: "Exit", click: this._closeApp.bind(this) }
+            { label: "Sair", click: () => app.exit }
         ]
-    }]));
-*/
+    }]);
+
+    mainWindow.setMenu(menuPrincipal);
+
+    registrarRendererListeners();
 
 });
 
@@ -46,3 +52,28 @@ app.on('activate', () => {
         createWindow()
     }
 });
+
+const registrarRendererListeners = () => {
+    ipcMain.on('toggle-item-menu', (evt, nomeMenu, habilitar) => toggleItemMenu(nomeMenu, habilitar, menuPrincipal));
+    ipcMain.on('sair', app.quit);
+};
+
+
+const toggleItemMenu = (nome, habilitar, itens) => {
+    if (!itens || !Array.isArray(itens) || !itens.length) return;
+    for (let i = 0; i < itens.length; ++i)
+    {
+        if (itens[i].label.indexOf(nome) !== -1)
+        {
+            itens[i].enabled = habilitar;
+            return true;
+        }
+        if (itens[i].submenu && itens[i].submenu.length)
+        {
+            if (toggleItemMenu(nome, habilitar, itens[i].submenu))
+            {
+                return true;
+            }
+        }
+    }
+};

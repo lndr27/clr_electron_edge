@@ -1,4 +1,5 @@
 ﻿using Lndr.Simple.CLR;
+using Lndr.Simple.CLR.Controllers;
 
 namespace Lndr.Simple.Console
 {
@@ -6,8 +7,9 @@ namespace Lndr.Simple.Console
     {
         static void Main(string[] args)
         {
-            var classe = new Class1();
-            classe.NOtAdicionarPacoteEventos(new object[] { @"C:\\users\lndr2\desktop\teste.json" });
+            var classe = new EventosController();
+
+            classe.AdicionarPacoteEventosAsync(new string[] { @"C:\\users\lndr2\desktop\teste.reinf" }).Wait();
         }
     }
 }

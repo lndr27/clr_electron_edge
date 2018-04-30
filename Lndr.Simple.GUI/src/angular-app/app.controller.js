@@ -1,39 +1,115 @@
-(function () {
+const fs = require('fs');
+const { remote, ipcRenderer } = require('electron');
+const { dialog, getCurrentWindow, Menu } = remote;
 
-    const fs = require('fs');
-    const dialog = require('electron').remote.dialog;
+var app = angular.module("App", []);
 
-    var app = angular.module("App", []);
+const browserWindow = getCurrentWindow();    
 
-    app.controller("MainController", function ($scope, AppService) {
+app.controller("MainController", function ($scope, AppService) {
 
-        $scope.eventos = [];
+    $scope.processando = false;
 
-        $scope.init = function () {
-           
-        };
+    $scope.isMaximizado = false;
 
-        $scope.foo = function() {
+    $scope.empresas = [];
 
-            AppService.downloadLoteRetornosEmpresa(1)
-            .then((response) => {
-                debugger;
-                dialog.showSaveDialog({
-                    buttonLabel: 'Salvar',
-                    filters: [{ name: 'lote', extensions: ['.pkg']}]
-                }, (filename) => {
-                    debugger;
-                    fs.writeFile(filename, new Buffer(response), (err) => {
-                        if (err) console.log(err);
-                    });
+    $scope.empresaSelecionada = null;
 
+    $scope.lotes = [];
+
+    $scope.eventos = [];
+
+    /**
+     * Texto exibido no rodape da janela
+     */
+    $scope.statusAplicacao = '';    
+
+    /**
+     * Funcao acionada ao carregar a janela principal
+     */
+    $scope.init = function () {        
+        var loadingAlert = alertify.loadingDialog('Carregando');
+
+        AppService.listarEmpresas()
+        .then(empresas => $scope.empresas = empresas)
+        .catch(err => console.log(err))
+        .finally(() => {
+            loadingAlert.close();
+            $scope.$apply();
+        });
+
+        $('body').on('keydown', evt => {
+            if (evt.keyCode === 123) 
+                browserWindow.webContents.toggleDevTools();
+        });
+    };
+    
+    /**
+     * Downloa dos lotes de retorno da empresa selecionada
+     */
+    $scope.downloadLoteRetornoEmpresa = () => {
+        AppService.downloadLoteRetornosEmpresa($scope.empresaSelecionada.Id)
+        .then(response => {
+            dialog.showSaveDialog({
+                buttonLabel: 'Salvar',
+                filters: [{ name: 'lote', extensions: ['.pkg']}]
+            }, filename => {
+                fs.writeFile(filename, new Buffer(response), (err) => {
+                    if (err) console.log(err);
                 });
-            })
-            .catch((err) => {
-                console.log(err);
             });
-        };
+        })
+        .catch(err => {
+            console.log(err);
+        });        
 
-    });
+    };    
 
-})();
+    /**
+     * Envia pacotes para serem adicionados ao banco de dados local
+     */
+    $scope.adicionarPacoteEventos = () => {
+        if ($scope.processando) return;
+        
+        $scope.processando = true;
+
+        dialog.showOpenDialog({
+            buttonLabel: 'Abrir Lote',
+            filters: [ { name: 'Pacote', extensions: ['reinf'] } ],
+            properties: [ 'multiSelections' ]
+        }, filenames => {
+            if (!filenames) return;
+
+            let loadingAlert = alertify.loadingDialog('Aguarde, processando lotes.');
+
+            AppService.adicionarPacoteEventos(filenames)
+            .then(response => {
+                loadingAlert.close();
+            })
+            .catch(err => console.log(err))
+            .finnaly(() => {
+                $scope.processando = false;
+                loadingAlert.close();
+            });
+        });
+    };
+    
+    /**
+     * Fechar aplicacao
+     */
+    $scope.sair = () => ipcRenderer.send('sair');
+
+    /**
+     * Minimizar Janela
+     */
+    $scope.minimizar = () => browserWindow.minimize();
+
+    /**
+     * Maximiza ou Restaura janela
+     */
+    $scope.maximizar = () => {
+        browserWindow.isMaximized() ? browserWindow.restore() : browserWindow.maximize();
+        $scope.isMaximizado = !scope.isMaximizado;
+    };
+});

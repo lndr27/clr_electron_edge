@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lndr Simple CLR comm</title>
+    <link rel="stylesheet" type="text/css" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../node_modules/alertifyjs/build/css/alertify.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../node_modules/alertifyjs/build/css/themes/default.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../node_modules/linearicons/dist/web-font/style.css" />
+    <link rel="stylesheet" type="text/css" href="./dashboard.theme.css" />
+</head>
+
+<body ng-app="App" ng-controller="MainController" ng-init="init()">
+
+    <!-- BARRA DE TITULO  -->
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 drag">
+        <span class="navbar-brand col-md-2 text-muted px-2">LNDR ELECTRON TEMPLATE</span>
+
+        <form class="form-inline no-drag">
+            <button ng-click="minimizar()" type="button" class="btn-top-bar btn-minimize">&minus;</button>
+            <button ng-click="maximizar()" type="button" class="btn-top-bar btn-mazimize">
+                <span class="lnr lnr-frame-expand" ng-class="{ 'lnr-frame-expand': !isMaximizado, 'lnr-frame-contract': isMaximizado }"></span>
+            </button>
+            <button ng-click="sair()" type="button" class="btn-top-bar btn-close">
+                <span class="lnr lnr-cross"></span>
+            </button>
+        </form>
+    </nav>
+    <!-- FIM - BARRA DE TITULO - FIM  -->
+
+    <div class="container-fluid">
+
+        <!-- MENU LATERAL -->
+        <div class="row">
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span class="lnr lnr-apartment"></span>
+                                Empresas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                <span class="lnr lnr-gift"></span>
+                                Lotes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span class="lnr lnr-layers"></span>
+                                Eventos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <!-- FIM - MENU LATERAL - FIM -->
+
+            <!-- CONTEUDO PRINCIPAL -->
+            <main role="main" class="col-10 ml-sm-auto px-0">
+
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 border-bottom px-2">
+                    <div>
+                        <div class="form-group row float-right">
+                            <label class="col-sm-4 col-form-label">Empresa</label>
+                            <div class="col-sm-8">
+                                <select class="form-control form-control-sm" ng-options="empresa.Nome for empresa in empresas track by empresa.Id" ng-model="empresaSelecionada">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group mr-2">
+                            <button class="btn btn-sm btn-outline-secondary" ng-click="adicionarPacoteEventos()">
+                                <span class="lnr lnr-file-add"></span>
+                                <span>Adicionar Lotes</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary">Export</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Identificador</th>
+                                <th>Tipo do Evento</th>
+                                <th>Descricao</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="evento in eventos">
+                                <td>{{ evento.IdEvento }}</td>
+                                <td>{{ evento.TipoEventoDescricao }}</td>
+                                <td>{{ evento.Descricao }}</td>
+                                <td>{{ evento.Status }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </main>
+            <!-- FIM - CONTEUDO PRINCIPAL - FIM -->
+        </div>
+    </div>
+
+    <!-- RODAPE -->
+    <footer class="footer">
+        <div class="container-fluid">
+            <span class="text-light">{{ statusAplicacao }}</span>
+        </div>
+    </footer>
+    <!-- FIM - RODAPE - FIM -->
+
+    <script>        
+        window.$ = window.jQuery = require('jquery');
+        window.alertify = require('alertifyjs');
+        require('angular');
+    </script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script>
+        require('../angular-app/extra.js');
+        require('../angular-app/app.controller.js');
+        require('../angular-app/app.service.js');
+    </script>
+</body>
+
+</html>
