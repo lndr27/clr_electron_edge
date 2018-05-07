@@ -10,118 +10,21 @@ namespace Lndr.Simple.CLR.Helpers
     public class AssinadorXml
     {
         private static readonly string signatureMethod = @"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+
         private static readonly string digestMethod = @"http://www.w3.org/2001/04/xmlenc#sha256";
 
-        public static string Assinar()
+        public static string Assinar(string xmlString)
         {
             var xml = new XmlDocument();
-            xml.LoadXml(@"<eFinanceira xmlns=""http://www.eFinanceira.gov.br/schemas/evtMovOpFin/v1_0_1"">
-<evtMovOpFin id=""ID00000000001"">
-<ideEvento>
-<indRetificacao>1</indRetificacao>
-<tpAmb>1</tpAmb>
-<aplicEmi>2</aplicEmi>
-<verAplic>00000000000000000001</verAplic>
-</ideEvento>
-<ideDeclarante>
-<cnpjDeclarante>01234567891234</cnpjDeclarante>
-</ideDeclarante>
-<ideDeclarado>
-<tpNI>2</tpNI>
-<tpDeclarado>FATCA101</tpDeclarado>
-<NIDeclarado>01234567891234</NIDeclarado>
-<NIF>
-<NumeroNIF>1234567890123456789012345</NumeroNIF>
-<PaisEmissaoNIF>US</PaisEmissaoNIF>
-</NIF>
-<NomeDeclarado>
-Nome do Declarado com 100 caracteres com 100 caracteres com 100 caracteres com 100 caracteres com 10
-</NomeDeclarado>
-<EnderecoLivre>
-EnderecoLivre com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres lalalal
-</EnderecoLivre>
-<PaisEndereco>
-<Pais>BR</Pais>
-</PaisEndereco>
-<Proprietarios>
-<tpNI>1</tpNI>
-<NIProprietario>01234567891</NIProprietario>
-<NIF>
-<NumeroNIF>1234567890123456789012345</NumeroNIF>
-<PaisEmissaoNIF>US</PaisEmissaoNIF>
-</NIF>
-<Nome>
-Nome com 100 caracteres com 100 caracteres com 100 caracteres com 100 caracteres com 100 caracteres
-</Nome>
-<EnderecoLivre>
-EnderecoLivre com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres com 200 caracteres lalalal
-</EnderecoLivre>
-<PaisEndereco>
-<Pais>BR</Pais>
-</PaisEndereco>
-<PaisResid>
-<Pais>BR</Pais>
-</PaisResid>
-<PaisNacionalidade>
-<Pais>BR</Pais>
-</PaisNacionalidade>
-<Reportavel>
-<Pais>US</Pais>
-</Reportavel>
-</Proprietarios>
-</ideDeclarado>
-<mesCaixa>
-<anoMesCaixa>201401</anoMesCaixa>
-<movOpFin>
-<Conta>
-<infoConta>
-<Reportavel>
-<Pais>US</Pais>
-</Reportavel>
-<tpConta>1</tpConta>
-<subTpConta>101</subTpConta>
-<tpNumConta>OECD605</tpNumConta>
-<numConta>1234|123|1234567890123</numConta>
-<tpRelacaoDeclarado>3</tpRelacaoDeclarado>
-<NoTitulares>4</NoTitulares>
-<BalancoConta>
-<totCreditos>150000,00</totCreditos>
-<totDebitos>100000,00</totDebitos>
-<totCreditosMesmaTitularidade>100000,00</totCreditosMesmaTitularidade>
-<totDebitosMesmaTitularidade>100000,00</totDebitosMesmaTitularidade>
-</BalancoConta>
-<PgtosAcum>
-<tpPgto>FATCA503</tpPgto>
-<totPgtosAcum>0,00</totPgtosAcum>
-</PgtosAcum>
-</infoConta>
-</Conta>
-<Cambio>
-<totCompras>1000000,00</totCompras>
-<totVendas>1000000,00</totVendas>
-<totTransferencias>1000000,00</totTransferencias>
-</Cambio>
-</movOpFin>
-</mesCaixa>
-</evtMovOpFin>
-</eFinanceira>");
-
-            var certificado = SelecionarCertificadoAssinaturaArquivo();
-            var tag = obtemElementoAssinar(xml);
-
-            assinarXML(xml, certificado, tag, "id");
-            return null;
+            xml.LoadXml(xmlString);
+            var xmlAssinado = assinarXML(xml, SelecionarCertificadoAssinaturaArquivo(), obtemElementoAssinar(xml), "id");
+            return xmlAssinado != null ? xmlAssinado.OuterXml : null;
         }
-
 
         private static string obtemElementoAssinar(XmlDocument arquivo)
         {
             var match = Regex.Match(arquivo.OuterXml, @"<(?<tagAssinar>evt.+) id=""ID.+?>", RegexOptions.IgnoreCase);
-            if (match.Success)
-            {
-                return match.Groups["tagAssinar"].Value;
-            }
-            return null;
+            return match.Success ? match.Groups["tagAssinar"].Value : null;
         }
 
         private static XmlDocument assinarXML(XmlDocument documentoXML, X509Certificate2 certificadoX509, string tagAAssinar, string idAtributoTag)

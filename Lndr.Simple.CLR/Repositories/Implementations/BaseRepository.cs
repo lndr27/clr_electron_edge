@@ -1,13 +1,49 @@
 ﻿using Dapper;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using Dapper;
+using Dapper.Contrib.Extensions;
+using System.Linq;
 
 namespace Lndr.Simple.CLR.Repositories
 {
-    class BaseRepository
+    class BaseRepository<TEntity> : IRepository<TEntity> where TEntity: class
     {
+        public virtual int Add(TEntity entity)
+        {
+            using (var connection = this.GetDbConnection())
+            {
+                return (int)connection.Insert(entity);
+            }
+        }
+
+        public virtual TEntity Get(int id)
+        {
+            using (var connection = this.GetDbConnection())
+            {
+                return connection.Get<TEntity>(id);
+            }
+        }
+
+        public virtual List<TEntity> List()
+        {
+            using (var connection = this.GetDbConnection())
+            {
+                return connection.GetAll<TEntity>().ToList();
+            }
+        }
+
+        public virtual void Update(TEntity entity)
+        {
+            using (var connection = this.GetDbConnection())
+            {
+                SqlMapperExtensions.Update(connection, entity);
+            }
+        }
+
         public SQLiteConnection GetDbConnection()
         {
             var arquivoBancoDados = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ObrigacoesLegais", "db.sqlite");
@@ -52,6 +88,16 @@ namespace Lndr.Simple.CLR.Repositories
 
         private void CriarTabelas(IDbConnection connection)
         {
+
+            connection.Execute(@"
+CREATE TABLE Job (
+     Id INTEGER PRIMARY KEY AUTOINCREMENT
+    ,EmpresaId INTEGER NOT NULL
+    ,DataCriacao DATETIME NOT NULL
+    ,DataAtualizacao DATETIME NOT NULL
+    ,DataFinalizacao DATETIME NOT NULL
+    ,StatusJob INTEGER NOT NULL
+);");
 
             connection.Execute(
 @"CREATE TABLE Empresas (
