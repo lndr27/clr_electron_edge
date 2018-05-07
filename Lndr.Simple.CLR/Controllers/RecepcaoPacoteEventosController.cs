@@ -19,9 +19,20 @@ namespace Lndr.Simple.CLR.Controllers
             return new EmpresaRepository().List();
         }
 
-        public async Task<object> ListarEventosEmpresaAsync(int idEmpresa)
+        public async Task<object> ListarEventosEmpresaAsync(dynamic input)
         {
-            return new EventoRepository().ListEventosEmpresa(idEmpresa);
+            var repository = new EventoRepository();
+
+            var totalEventos = repository.QuantidadeEventosEmpresa((int)input.idEmpresa);
+            var totalPaginas = Math.Ceiling(totalEventos / (double)input.pagina);
+            var pagina = (int)((int)input.pagina > totalPaginas ? totalPaginas : (int)input.pagina);
+            pagina = pagina < 0 ? 0 : pagina;
+            return new
+            {
+                eventos = repository.ListEventosEmpresa((int)input.idEmpresa, (int)input.tamanhoPagina, pagina),
+                totalPaginas,
+                pagina
+            };
         }
 
         public async Task<object> AdicionarPacoteEventosAsync(object input)

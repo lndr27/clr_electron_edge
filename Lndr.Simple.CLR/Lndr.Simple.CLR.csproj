@@ -119,7 +119,10 @@
     <Compile Include="Class1.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\RecepcaoPacoteEventosController.cs" />
+    <Compile Include="Helpers\AssinadorXml.cs" />
+    <Compile Include="Helpers\Extensions\EnumExtensions.cs" />
     <Compile Include="Helpers\Extensions\ObjectExtensions.cs" />
+    <Compile Include="Helpers\Guard.cs" />
     <Compile Include="Helpers\PacoteHelper.cs" />
     <Compile Include="Models\ArquivoEntradaDTO.cs" />
     <Compile Include="Models\Entities\Empresa.cs" />

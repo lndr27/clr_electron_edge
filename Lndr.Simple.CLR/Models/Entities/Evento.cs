@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Lndr.Simple.CLR.Models.Enums;
+using Lndr.Simple.CLR.Helpers.Extensions;
+using System;
 
 namespace Lndr.Simple.CLR.Models.Entities
 {
@@ -9,6 +11,14 @@ namespace Lndr.Simple.CLR.Models.Entities
         public int IdEmpresa { get; set; }
 
         public int TipoEvento { get; set; }
+
+        public string TipoEventoDescricao
+        {
+            get
+            {
+                return ((TipoEventoEnum)this.TipoEvento).GetEnumDescription();
+            }
+        }
 
         public DateTime DataUpload { get; set; }
 
@@ -21,5 +31,13 @@ namespace Lndr.Simple.CLR.Models.Entities
         public string EventoBase64Encriptado { get; set; }
 
         public int StatusEvento { get; set; }
+
+        public string StatusEventoDescricao
+        {
+            get
+            {
+                return ((StatusEventoEnum)this.StatusEvento).GetEnumDescription();
+            }
+        }
     }
 }

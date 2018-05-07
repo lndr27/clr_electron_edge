@@ -1,3 +1,136 @@
+html, body {
+    height:100%;
+    margin:0;
+    padding:0;
+    font-size: .9rem;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+header{
+    width: 100%;
+    background: #2c3e52 !important;
+    color: white;
+    position: fixed; 
+    top: 0;
+    height: 25px !important;
+}
+
+.content {
+    height: 100%;
+    padding:25px 0 16px 0; /* Header height and footer height */
+    margin:0 auto 0 auto; /* Center content */
+    box-sizing:border-box;
+}
+
+#scrollable2 {
+    height: calc(100% - 54px);
+    min-width: 300px;
+    margin-left: 150px;
+    overflow:auto;
+    box-sizing:border-box;
+}
+
+footer {
+    width: 100%;
+    background-color: #7d919a;
+    color: white;
+    position: fixed; 
+    bottom: 0;
+    height: 16px !important;
+    line-height: 16px;
+}
+
+
+
+
+.drag {
+    -webkit-app-region: drag
+}
+
+.no-drag {
+    -webkit-app-region: no-drag
+}
+
+.btn-top-bar {
+    background: none;
+    border: none;
+    color: #b1b1b1;
+    height: 25px;
+    font-family: Arial;
+    line-height: 18px;
+    width: 34px;
+    font-size: 18px;
+    outline: 0 !important;
+}
+
+.btn-top-bar.btn-close:hover {
+    color: black;
+    background: rgb(143, 38, 38);
+}
+
+.btn-minimize:hover,
+.btn-mazimize:hover {
+    /*background: rgba(0, 0, 0, 0.3);*/
+    color: white;
+}
+
+.btn-minimize {
+    font-size: 22px;
+    line-height: 22px;
+}
+
+.btn-mazimize {
+    font-size: 16px;
+    line-height: 16px;
+}
+
+.window-buttons {
+    display: block;
+    float: right;
+}
+
+.inner-header {
+    margin-left: 150px;
+}
+
+
+
+
+/*  Barra Lateral */
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #333;
+}
+
+.sidebar .nav-link .feather {
+    margin-right: 4px;
+    color: #999;
+}
+
+.sidebar .nav-link.active {
+    color: #007bff;
+}
+
+.sidebar .nav-link:hover .feather,
+.sidebar .nav-link.active .feather {
+    color: inherit;
+}
+
+.sidebar1 {
+    top:25px;
+    bottom:16px;
+    width: 150px;
+    position:absolute;
+    box-sizing:border-box;
+    background-color: #f8f9fa!important;
+    border-right: 1px solid rgba(0, 0, 0, .05);
+    left:0;
+    padding-top: 10px;
+}
+/*  xxxxxxx Fim Barra Lateral xxxxxx */
+
+
+/* ROTACAO ICONES */
 @keyframes rotating {
     from {
         transform: rotate(0deg);
@@ -14,13 +147,9 @@
 .rotating.lnr {
     display: inline-block;
 }
+/* xxxxxx FIM ROTACAO ICONES xxxxxx */
 
-
-.lnr {
-    font-size: 1rem;
-}
-
-.container-fluid {
-    padding-left: 0;
-    padding-right: 0;
+thead {
+    background: white;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .1);
 }

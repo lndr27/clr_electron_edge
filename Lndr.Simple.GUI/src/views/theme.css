@@ -42,7 +42,7 @@ body {
 }
 
 .sidebar-sticky {
-    position: relative;
+    position: fixed;
     top: 0;
     height: calc(100vh - 48px);
     padding-top: .5rem;
@@ -159,6 +159,5 @@ body {
 a.navbar-brand.col-sm-3.col-md-2.mr-0 {
     color: white;
 }
-
 
 

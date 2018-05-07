@@ -29,7 +29,7 @@ body {
 }
 
 .footer {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     width: 100%;
     height: 16px;
@@ -78,13 +78,6 @@ body {
     /* Scrollable contents if viewport is shorter than content. */
 }
 
-@supports ((position: -webkit-sticky) or (position: sticky)) {
-    .sidebar-sticky {
-        position: -webkit-sticky;
-        position: sticky;
-    }
-}
-
 .sidebar .nav-link {
     font-weight: 500;
     color: #333;
@@ -114,7 +107,7 @@ body {
    */
 
 [role="main"] {
-    padding-top: 25px;
+    /*padding-top: 25px;*/
     /* Space for fixed navbar */
 }
 
@@ -216,4 +209,8 @@ footer .container-fluid {
     font-size: 10px;
     line-height: 14px;
     font-weight: 100;
+}
+
+.container-fluid {
+    margin-top: 25px;
 }

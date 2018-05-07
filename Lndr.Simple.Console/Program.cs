@@ -1,5 +1,7 @@
 ﻿using Lndr.Simple.CLR;
 using Lndr.Simple.CLR.Controllers;
+using Lndr.Simple.CLR.Helpers;
+using System;
 
 namespace Lndr.Simple.Console
 {
@@ -7,9 +9,12 @@ namespace Lndr.Simple.Console
     {
         static void Main(string[] args)
         {
-            var classe = new EventosController();
+            //var classe = new EventosController();
 
-            classe.AdicionarPacoteEventosAsync(new string[] { @"C:\\users\lndr2\desktop\teste.reinf" }).Wait();
-        }
+            //classe.AdicionarPacoteEventosAsync(new string[] { @"C:\\users\lndr2\desktop\teste.reinf" }).Wait();
+
+            AssinadorXml.Assinar();
+
+        }        
     }
 }

@@ -40,11 +40,20 @@ namespace Lndr.Simple.CLR.Repositories
             }
         }
 
-        public List<Evento> ListEventosEmpresa(int idEmpresa)
+        public List<Evento> ListEventosEmpresa(int idEmpresa, int tamPagina, int pagina)
         {
             using (var connection = base.GetDbConnection())
             {
-                return connection.Query<Evento>(@"SELECT e.* FROM Eventos e WHERE idEmpresa = @idEmpresa", new { idEmpresa }).ToList();
+                var offset = (pagina - 1) * tamPagina;
+                return connection.Query<Evento>(@"SELECT e.* FROM Eventos e WHERE idEmpresa = @idEmpresa LIMIT @tamPagina OFFSET @offset", new { idEmpresa, tamPagina, offset }).ToList();
+            }
+        }
+
+        public int QuantidadeEventosEmpresa(int idEmpresa)
+        {
+            using (var connection = base.GetDbConnection())
+            {
+                return connection.ExecuteScalar<int>(@"SELECT COUNT(1) FROM Eventos WHERE idEmpresa = @idEmpresa", new { idEmpresa });
             }
         }
 
