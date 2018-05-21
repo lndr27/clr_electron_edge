@@ -148,7 +148,7 @@ app.controller("MainController", function ($scope, AppService) {
         })
         .catch(err => console.error(err))
         .finally(_ => {
-
+            
         });
     };
 

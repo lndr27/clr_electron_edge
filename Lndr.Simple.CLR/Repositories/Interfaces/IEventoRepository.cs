@@ -5,6 +5,10 @@ namespace Lndr.Simple.CLR.Repositories
 {
     interface IEventoRepository: IRepository<Evento>
     {
-        List<Evento> ListEventosEmpresa(int idEmpresa);
+        List<Evento> ListEventosEmpresa(int idEmpresa, int tamPagina, int pagina);
+
+        int QuantidadeEventosEmpresa(int idEmpresa);
+
+        Evento GetByIdEvento(string idEvento);
     }
 }

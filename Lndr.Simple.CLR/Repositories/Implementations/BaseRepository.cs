@@ -1,13 +1,48 @@
 ﻿using Dapper;
+using Dapper.Contrib.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
 
 namespace Lndr.Simple.CLR.Repositories
 {
-    class BaseRepository
+    class BaseRepository<TEntity> : IRepository<TEntity> where TEntity: class
     {
+        public virtual int Add(TEntity entity)
+        {
+            using (var conn = this.GetDbConnection())
+            {
+                return (int)conn.Insert(entity);
+            }
+        }
+
+        public virtual TEntity Get(int id)
+        {
+            using (var conn = this.GetDbConnection())
+            {
+                return conn.Get<TEntity>(id);
+            }
+        }        
+
+        public virtual List<TEntity> GetAll()
+        {
+            using (var conn = this.GetDbConnection())
+            {
+                return conn.GetAll<TEntity>().ToList();
+            }
+        }
+
+        public virtual void Update(TEntity entity)
+        {
+            using (var conn = this.GetDbConnection())
+            {
+                SqlMapperExtensions.Update(conn, entity);
+            }
+        }
+
         public SQLiteConnection GetDbConnection()
         {
             var arquivoBancoDados = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ObrigacoesLegais", "db.sqlite");
@@ -17,7 +52,7 @@ namespace Lndr.Simple.CLR.Repositories
                 this.CriarArquivoBancoDados(arquivoBancoDados);
 
                 var success = true;
-                
+
                 using (var connection = new SQLiteConnection(string.Concat("Data Source=", arquivoBancoDados)))
                 {
                     connection.Open();
@@ -28,7 +63,7 @@ namespace Lndr.Simple.CLR.Repositories
                     catch (Exception)
                     {
                         success = false;
-                    }                    
+                    }
                 }
                 if (!success)
                 {
@@ -52,14 +87,16 @@ namespace Lndr.Simple.CLR.Repositories
 
         private void CriarTabelas(IDbConnection connection)
         {
-
+            #region Empresas
             connection.Execute(
 @"CREATE TABLE Empresas (
      Id      INTEGER PRIMARY KEY AUTOINCREMENT
     ,Nome    VARCHAR NOT NULL
     ,CNPJ    VARCHAR NOT NULL
 )");
+            #endregion
 
+            #region Eventos
             connection.Execute(
 @"CREATE TABLE Eventos (
      Id                              INTEGER PRIMARY KEY AUTOINCREMENT
@@ -72,7 +109,9 @@ namespace Lndr.Simple.CLR.Repositories
     ,StatusEvento                    INTEGER NOT NULL
     ,NumeroRecibo                    VARCHAR(50) NULL
 )");
+            #endregion
 
+            #region EventoOcorrencias
             connection.Execute(
 @"CREATE TABLE EventoOcorrencias (
      Id              INTEGER PRIMARY KEY AUTOINCREMENT
@@ -82,14 +121,31 @@ namespace Lndr.Simple.CLR.Repositories
     ,Localizacao     VARCHAR(8000)
     ,TipoOcorrencia  INTEGER    
 )");
+            #endregion
 
+            #region LogErros
             connection.Execute(
 @"CREATE TABLE LogErros (
-    Id               INTEGER PRIMARY KEY AUTOINCREMENT
+     Id              INTEGER PRIMARY KEY AUTOINCREMENT
+    ,Tipo            VARCHAR
     ,Mensagem        VARCHAR
     ,Stacktrace      VARCHAR
     ,Data            DATETIME
 )");
+            #endregion
+
+            #region Job
+            connection.Execute(
+@"CREATE TABLE Jobs (
+     Id              INTEGER PRIMARY KEY AUTOINCREMENT
+    ,IdEmpresa       INTEGER
+    ,Tipo            INTEGER
+    ,StatusJob       INTEGER
+    ,DataInicio      DATETIME
+    ,DataFim         DATETIME
+    ,DataAtualizacao DATETIME
+)");
+            #endregion
         }
     }
 }

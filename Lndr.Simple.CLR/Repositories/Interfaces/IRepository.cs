@@ -6,7 +6,7 @@ namespace Lndr.Simple.CLR.Repositories
     {
         TEntity Get(int id);
 
-        List<TEntity> List();
+        List<TEntity> GetAll();
 
         int Add(TEntity entity);
 

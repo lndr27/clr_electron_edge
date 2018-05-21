@@ -3,6 +3,7 @@ using Lndr.Simple.CLR.Models;
 using Lndr.Simple.CLR.Models.Entities;
 using Lndr.Simple.CLR.Models.Enums;
 using Lndr.Simple.CLR.Repositories;
+using Lndr.Simple.CLR.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Lndr.Simple.CLR.Controllers
     {
         public async Task<object> ListarEmpresasAsync(dynamic input)
         {
-            return new EmpresaRepository().List();
+            return new EmpresaRepository().GetAll();
         }
 
         public async Task<object> ListarEventosEmpresaAsync(dynamic input)
@@ -39,6 +40,8 @@ namespace Lndr.Simple.CLR.Controllers
         {
             try
             {
+                var service = new EventoService();
+
                 var quantidadeEventosNovos = 0;
                 var arquivos = input.ToStringArray();
                 foreach (var caminhoArquivo in arquivos)
@@ -46,8 +49,7 @@ namespace Lndr.Simple.CLR.Controllers
                     var arquivo = JsonConvert.DeserializeObject<ArquivoEntradaDTO>(File.ReadAllText(caminhoArquivo));
                     if (arquivo != null)
                     {
-                        var idEmpresa = this.SalvarEmpresa(arquivo.Empresa);
-                        quantidadeEventosNovos += this.SalvarEventos(arquivo.Eventos, idEmpresa);
+                        quantidadeEventosNovos += service.AdicionarPacoteEventos(arquivo);
                     }
                 }
                 return new { status = "OK", quantidadeEventosNovos };
@@ -57,44 +59,6 @@ namespace Lndr.Simple.CLR.Controllers
                 File.WriteAllText(@"C:\\users\lndr2\desktop\log.txt", ex.Message + Environment.NewLine + ex.StackTrace);
                 throw;
             }
-        }
-
-        private int SalvarEmpresa(Empresa empresa)
-        {
-            var empresaRepository = new EmpresaRepository();
-            var empresaBase = empresaRepository.GetByCnpj(empresa.CNPJ);
-            if (empresaBase == null)
-            {
-                return empresaRepository.Add(empresa);
-            }
-            return empresaBase.Id;
-        }
-
-        private int SalvarEventos(List<Evento> eventos, int idEmpresa)
-        {
-            var novosEventos = 0;
-            var eventoRepository = new EventoRepository();
-            var data = DateTime.Now;
-
-            foreach (var evento in eventos)
-            {
-                var eventoBase = eventoRepository.GetByIdEvento(evento.IdEvento);
-                if (eventoBase == null)
-                {
-                    eventoRepository.Add(new Evento
-                    {
-                        IdEmpresa              = idEmpresa,
-                        DataUpload             = data,
-                        IdEvento               = evento.IdEvento,
-                        StatusEvento           = (int)StatusEventoEnum.Novo,
-                        TipoEvento             = evento.TipoEvento,
-                        DataAtualizacao        = data,
-                        EventoBase64Encriptado = evento.EventoBase64Encriptado
-                    });
-                    novosEventos++;
-                }
-            }
-            return novosEventos;
         }
 
         public async Task<object> ComecarEnvioLotesEmpresaAsync(int idEmpresa)

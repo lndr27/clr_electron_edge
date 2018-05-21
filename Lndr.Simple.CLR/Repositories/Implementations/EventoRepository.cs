@@ -6,40 +6,8 @@ using System.Linq;
 
 namespace Lndr.Simple.CLR.Repositories
 {
-    class EventoRepository : BaseRepository, IRepository<Evento>
+    class EventoRepository : BaseRepository<Evento>, IEventoRepository
     {
-        public int Add(Evento evento)
-        {
-            using (var connection = base.GetDbConnection())
-            {
-                return (int)connection.Insert(evento);
-            }
-        }
-
-        public Evento Get(int id)
-        {
-            using (var connection = base.GetDbConnection())
-            {
-                return connection.Get<Evento>(id);
-            }
-        }
-
-        public List<Evento> List()
-        {
-            using (var connection = base.GetDbConnection())
-            {
-                return connection.Query<Evento>(@"SELECT * FROM Eventos").ToList();
-            }
-        }
-
-        public void Update(Evento evento)
-        {
-            using (var connection = base.GetDbConnection())
-            {
-                SqlMapperExtensions.Update(connection, evento);
-            }
-        }
-
         public List<Evento> ListEventosEmpresa(int idEmpresa, int tamPagina, int pagina)
         {
             using (var connection = base.GetDbConnection())
