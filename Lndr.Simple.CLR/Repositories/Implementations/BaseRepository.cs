@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using Dapper;
+using Dapper.Contrib.Extensions;
 using System.Linq;
 
 namespace Lndr.Simple.CLR.Repositories
@@ -13,33 +15,33 @@ namespace Lndr.Simple.CLR.Repositories
     {
         public virtual int Add(TEntity entity)
         {
-            using (var conn = this.GetDbConnection())
+            using (var connection = this.GetDbConnection())
             {
-                return (int)conn.Insert(entity);
+                return (int)connection.Insert(entity);
             }
         }
 
         public virtual TEntity Get(int id)
         {
-            using (var conn = this.GetDbConnection())
+            using (var connection = this.GetDbConnection())
             {
-                return conn.Get<TEntity>(id);
+                return connection.Get<TEntity>(id);
             }
-        }        
+        }
 
-        public virtual List<TEntity> GetAll()
+        public virtual List<TEntity> List()
         {
-            using (var conn = this.GetDbConnection())
+            using (var connection = this.GetDbConnection())
             {
-                return conn.GetAll<TEntity>().ToList();
+                return connection.GetAll<TEntity>().ToList();
             }
         }
 
         public virtual void Update(TEntity entity)
         {
-            using (var conn = this.GetDbConnection())
+            using (var connection = this.GetDbConnection())
             {
-                SqlMapperExtensions.Update(conn, entity);
+                SqlMapperExtensions.Update(connection, entity);
             }
         }
 
