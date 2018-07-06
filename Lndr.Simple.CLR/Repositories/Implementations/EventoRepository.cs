@@ -32,5 +32,21 @@ namespace Lndr.Simple.CLR.Repositories
                 return connection.QueryFirstOrDefault<Evento>(@"SELECT * FROM Eventos WHERE IdEvento = @idEvento", new { idEvento });
             }
         }
+
+        public Evento GetEventoNaoAssinados(int idEmpresa)
+        {
+            using (var connection = base.GetDbConnection())
+            {
+                return connection.QueryFirstOrDefault<Evento>(@"SELECT * FROM Eventos WHERE IdEmpresa = @idEmpresa", new { idEmpresa });
+            }
+        }
+
+        public int GetQuantidadeEventosNaoAssinados(int idEmpresa)
+        {
+            using (var connection = base.GetDbConnection())
+            {
+                return connection.ExecuteScalar<int>(@"SELECT COUNT(1) FROM Eventos WHERE IdEmpresa = @idEmpresa", new { idEmpresa });
+            }
+        }
     }
 }

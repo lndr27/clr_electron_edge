@@ -10,5 +10,9 @@ namespace Lndr.Simple.CLR.Repositories
         int QuantidadeEventosEmpresa(int idEmpresa);
 
         Evento GetByIdEvento(string idEvento);
+
+        Evento GetEventoNaoAssinados(int idEmpresa);
+
+        int GetQuantidadeEventosNaoAssinados(int idEmpresa);
     }
 }

@@ -29,7 +29,7 @@ namespace Lndr.Simple.CLR.Repositories
             }
         }
 
-        public virtual List<TEntity> List()
+        public virtual List<TEntity> GetAll()
         {
             using (var connection = this.GetDbConnection())
             {
@@ -104,7 +104,7 @@ namespace Lndr.Simple.CLR.Repositories
      Id                              INTEGER PRIMARY KEY AUTOINCREMENT
     ,IdEmpresa                       INTEGER NOT NULL
     ,IdEvento                        VARCHAR(36) NOT NULL
-    ,EventoBase64Encriptado          VARCHAR
+    ,XmlEvento                       VARCHAR
     ,TipoEvento                      INTEGER NOT NULL
     ,DataUpload                      DATETIME NOT NULL
     ,DataAtualizacao                 DATETIME NOT NULL

@@ -1,12 +1,5 @@
-﻿using Lndr.Simple.CLR.Models.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dapper;
-using System.Data.SQLite;
-using Dapper.Contrib.Extensions;
+﻿using Dapper;
+using Lndr.Simple.CLR.Models.Entities;
 
 namespace Lndr.Simple.CLR.Repositories
 {
@@ -20,8 +13,7 @@ namespace Lndr.Simple.CLR.Repositories
 SELECT *
 FROM Jobs
 WHERE   IdEmpresa = @idEmpresa
-    AND Tipo = @tipoJob
-", new { tipoJob, idEmpresa });
+    AND Tipo = @tipoJob", new { tipoJob, idEmpresa });
             }
         }
     }

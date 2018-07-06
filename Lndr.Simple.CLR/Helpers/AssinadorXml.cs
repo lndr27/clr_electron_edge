@@ -29,8 +29,8 @@ namespace Lndr.Simple.CLR.Helpers
 
         private static XmlDocument assinarXML(XmlDocument documentoXML, X509Certificate2 certificadoX509, string tagAAssinar, string idAtributoTag)
         {
-            Guard.ArgumentNullOrEmpty(tagAAssinar, "tagAAssinar");
-            Guard.ArgumentNullOrEmpty(idAtributoTag, "idAtributoTag");
+            Guard.ForArgumentNullOrEmpty(tagAAssinar, "tagAAssinar");
+            Guard.ForArgumentNullOrEmpty(idAtributoTag, "idAtributoTag");
             
             bool temChavePrivada = false;
             try

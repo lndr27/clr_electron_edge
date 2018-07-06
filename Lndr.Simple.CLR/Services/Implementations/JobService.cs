@@ -1,11 +1,8 @@
 ﻿using Lndr.Simple.CLR.Models.Entities;
 using Lndr.Simple.CLR.Models.Enums;
 using Lndr.Simple.CLR.Repositories;
+using Lndr.Simple.CLR.Helpers.Extensions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lndr.Simple.CLR.Services.Implementations
 {
@@ -32,9 +29,40 @@ namespace Lndr.Simple.CLR.Services.Implementations
                 this._jobRepository.Add(job);
 
             }
-            else if (job.StatusJob == (int)StatusJobEnum.Executando)
+            else if (job.StatusJob.In(
+                (int)StatusJobEnum.Concluido,
+                (int)StatusJobEnum.Cancelado,
+                (int)StatusJobEnum.Parado
+            ))
             {
-                return;
+                job.StatusJob = (int)StatusJobEnum.Executando;
+                job.DataInicio = DateTime.Now;
+                job.DataAtualizacao = job.DataInicio;
+                this._jobRepository.Update(job);
+            }
+        }
+
+        public StatusJobEnum GetStatusJob(TipoJobEnum tipojob, int idEmpresa)
+        {
+            var job = this._jobRepository.GetByTipo((int)tipojob, idEmpresa);
+            return job != null ? (StatusJobEnum)job.StatusJob : StatusJobEnum.Inexistente;
+        }
+
+        public void AtualizarStatusJob(TipoJobEnum tipojob, int idEmpresa, StatusJobEnum status)
+        {
+            var job = this._jobRepository.GetByTipo((int)tipojob, idEmpresa);
+            if (job != null)
+            {
+                job.StatusJob = (int)status;
+                job.DataAtualizacao = DateTime.Now;
+                if (((int)status).In(
+                    (int)StatusJobEnum.Concluido,
+                    (int)StatusJobEnum.Cancelado
+                ))
+                {
+                    job.DataFim = job.DataAtualizacao;
+                }
+                this._jobRepository.Update(job);
             }
         }
     }

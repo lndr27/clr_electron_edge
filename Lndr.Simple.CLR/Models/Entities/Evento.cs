@@ -28,7 +28,7 @@ namespace Lndr.Simple.CLR.Models.Entities
 
         public string NumeroRecibo { get; set; }
 
-        public string EventoBase64Encriptado { get; set; }
+        public string XmlEvento { get; set; }
 
         public int StatusEvento { get; set; }
 

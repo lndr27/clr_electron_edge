@@ -6,6 +6,10 @@
 
         Executando = 2,
 
-        Interrompido = 3
+        Concluido = 3,
+
+        Cancelado = 4,
+
+        Inexistente = 5
     }
 }

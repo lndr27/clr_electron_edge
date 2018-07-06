@@ -2,17 +2,22 @@
 using Lndr.Simple.CLR.Models.Entities;
 using Lndr.Simple.CLR.Models.Enums;
 using Lndr.Simple.CLR.Repositories;
+using Lndr.Simple.CLR.Services.Implementations;
+using Lndr.Simple.CLR.Helpers.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lndr.Simple.CLR.Helpers;
 
 namespace Lndr.Simple.CLR.Services
 {
     class EventoService : IEventoService
     {
         #region Campos e Ctor +
+        private readonly JobService _jobService;
+
         private readonly IEmpresaRepository _empresaRepository;
 
         private readonly IEventoRepository _eventoRepository;
@@ -21,6 +26,7 @@ namespace Lndr.Simple.CLR.Services
         {
             this._empresaRepository = new EmpresaRepository();
             this._eventoRepository = new EventoRepository();
+            this._jobService = new JobService();
         }
         #endregion
 
@@ -58,7 +64,7 @@ namespace Lndr.Simple.CLR.Services
                         StatusEvento           = (int)StatusEventoEnum.Novo,
                         TipoEvento             = evento.TipoEvento,
                         DataAtualizacao        = dataAtualizacao,
-                        EventoBase64Encriptado = evento.EventoBase64Encriptado
+                        XmlEvento              = evento.XmlEvento
                     });
                     novosEventos++;
                 }
@@ -68,7 +74,25 @@ namespace Lndr.Simple.CLR.Services
 
         public void ComecarAssinarEventos(int idEmpresa)
         {
+            if (this._jobService.GetStatusJob(TipoJobEnum.Assinatura, idEmpresa) == StatusJobEnum.Executando)
+            {
+                throw new ExecucaoJobInvalidaException("Assinatura em andamento");
+            }
+            this._jobService.ComecarJob(TipoJobEnum.Assinatura, idEmpresa);
 
+            var evento = this._eventoRepository.GetEventoNaoAssinados(idEmpresa);
+            while (evento != null && StatusJobEnum.Executando == this._jobService.GetStatusJob(TipoJobEnum.Assinatura, idEmpresa))
+            {
+                evento.XmlEvento = AssinadorXml.Assinar(evento.XmlEvento);
+                this._eventoRepository.Update(evento);
+                evento = this._eventoRepository.GetEventoNaoAssinados(idEmpresa);
+            }
+            this._jobService.AtualizarStatusJob(TipoJobEnum.Assinatura, idEmpresa, StatusJobEnum.Concluido);
+        }
+
+        public void AtualizarStatusAssinatura(int idEmpresa, StatusJobEnum status)
+        {
+            this._jobService.AtualizarStatusJob(TipoJobEnum.Assinatura, idEmpresa, status);
         }
     }
 }

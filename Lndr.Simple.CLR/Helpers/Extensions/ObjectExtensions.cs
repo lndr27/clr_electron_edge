@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Lndr.Simple.CLR.Helpers.Extensions
 {
@@ -17,6 +18,11 @@ namespace Lndr.Simple.CLR.Helpers.Extensions
                 }
             }
             return retorno.ToArray();
+        }
+
+        public static string ToJSON(this object obj)
+        {
+            return JsonConvert.SerializeObject(obj);
         }
     }
 }
