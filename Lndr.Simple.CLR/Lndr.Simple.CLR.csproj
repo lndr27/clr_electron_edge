@@ -120,7 +120,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\RecepcaoPacoteEventosController.cs" />
     <Compile Include="Helpers\AssinadorXml.cs" />
-    <Compile Include="Helpers\Encriptador.cs" />
+    <Compile Include="Helpers\CryptographyHelper.cs" />
     <Compile Include="Helpers\Exceptions\ExecucaoJobInvalidaException.cs" />
     <Compile Include="Helpers\Extensions\ByteArrayExtensions.cs" />
     <Compile Include="Helpers\Extensions\EnumerableExtensions.cs" />
@@ -130,6 +130,11 @@
     <Compile Include="Helpers\Extensions\StringExtensions.cs" />
     <Compile Include="Helpers\Guard.cs" />
     <Compile Include="Helpers\PacoteHelper.cs" />
+    <Compile Include="Helpers\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\WebService.cs" />
     <Compile Include="Models\ArquivoEntradaDTO.cs" />
     <Compile Include="Models\Entities\Empresa.cs" />
@@ -162,6 +167,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Helpers\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="libs\Dapper.Contrib.dll" />
     <EmbeddedResource Include="libs\Dapper.dll" />
     <EmbeddedResource Include="libs\Ionic.Zip.dll" />
