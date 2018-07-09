@@ -47,7 +47,7 @@ namespace Lndr.Simple.CLR.Repositories
 
         public SQLiteConnection GetDbConnection()
         {
-            var arquivoBancoDados = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ObrigacoesLegais", "db.sqlite");
+            var arquivoBancoDados = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ObrigacoesLegais", "db.sqlite");
 
             if (!File.Exists(arquivoBancoDados))
             {
@@ -62,7 +62,7 @@ namespace Lndr.Simple.CLR.Repositories
                     {
                         this.CriarTabelas(connection);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         success = false;
                     }
@@ -92,42 +92,83 @@ namespace Lndr.Simple.CLR.Repositories
             #region Empresas
             connection.Execute(
 @"CREATE TABLE Empresas (
-     Id      INTEGER PRIMARY KEY AUTOINCREMENT
-    ,Nome    VARCHAR NOT NULL
-    ,CNPJ    VARCHAR NOT NULL
+     Id       INTEGER PRIMARY KEY AUTOINCREMENT
+    ,Entidade INTEGER NOT NULL
+    ,Nome     VARCHAR NOT NULL
+    ,CNPJ     VARCHAR NOT NULL
 )");
             #endregion
 
-            #region Eventos
+            #region EFinanceira +
             connection.Execute(
-@"CREATE TABLE Eventos (
-     Id                              INTEGER PRIMARY KEY AUTOINCREMENT
-    ,IdEmpresa                       INTEGER NOT NULL
-    ,IdEvento                        VARCHAR(36) NOT NULL
-    ,XmlEvento                       VARCHAR
-    ,TipoEvento                      INTEGER NOT NULL
-    ,DataUpload                      DATETIME NOT NULL
-    ,DataAtualizacao                 DATETIME NOT NULL
-    ,StatusEvento                    INTEGER NOT NULL
-    ,NumeroRecibo                    VARCHAR(50) NULL
-)");
-            #endregion
-
-            #region EventoOcorrencias
-            connection.Execute(
-@"CREATE TABLE EventoOcorrencias (
+@"CREATE TABLE EFinanceiraLotes (
      Id              INTEGER PRIMARY KEY AUTOINCREMENT
-    ,IdEvento        INTEGER NOT NULL
-    ,Codigo          VARCHAR(100)
-    ,Descricao       VARCHAR(8000)
-    ,Localizacao     VARCHAR(8000)
-    ,TipoOcorrencia  INTEGER    
+    ,IdEmpresa       INTEGER NOT NULL
+    ,IdLote          VARCHAR(36) NOT NULL
+    ,XmlLote         BLOB
+    ,TipoEvento      INTEGER NOT NULL
+    ,DataUpload      DATETIME NOT NULL
+    ,DataAtualizacao DATETIME NOT NULL
+    ,StatusEvento    INTEGER NOT NULL
+)");
+            connection.Execute(@"CREATE INDEX IDX_EFinanceiraLotes_IdLote ON EFinanceiraLotes (IdLote)");
+
+            connection.Execute(
+@"CREATE TABLE EFinanceiraRetornoRecibos (
+     Id                 INTEGER PRIMARY KEY AUTOINCREMENT
+    ,IdEmpresa          INTEGER NOT NULL
+    ,IdLote             VARCHAR(36) NOT NULL
+    ,IdEvento           INTEGER NULL
+    ,TipoEvento         INTEGER NOT NULL
+    ,DataProcessamento  DATETIME NOT NULL
+    ,NumeroRecibo       VARCHAR(50) NULL
+)");
+
+            connection.Execute(
+@"CREATE TABLE EFinanceiraRetornoErros (
+     Id                 INTEGER PRIMARY KEY AUTOINCREMENT
+    ,IdEmpresa          INTEGER NOT NULL
+    ,IdLote             VARCHAR(36) NOT NULL
+    ,IdEvento           INTEGER NULL
+    ,Codigo             VARCHAR(100)
+    ,Descricao          VARCHAR(8000)
+    ,Localizacao        VARCHAR(8000)
+    ,DataProcessamento  DATETIME NOT NULL
+    ,TipoOcorrencia     INTEGER
 )");
             #endregion
+
+
+//            #region Eventos
+//            connection.Execute(
+//@"CREATE TABLE Eventos (
+//     Id                              INTEGER PRIMARY KEY AUTOINCREMENT
+//    ,IdEmpresa                       INTEGER NOT NULL
+//    ,IdEvento                        VARCHAR(36) NOT NULL
+//    ,XmlEvento                       VARCHAR
+//    ,TipoEvento                      INTEGER NOT NULL
+//    ,DataUpload                      DATETIME NOT NULL
+//    ,DataAtualizacao                 DATETIME NOT NULL
+//    ,StatusEvento                    INTEGER NOT NULL
+//    ,NumeroRecibo                    VARCHAR(50) NULL
+//)");
+//            #endregion
+
+//            #region EventoOcorrencias
+//            connection.Execute(
+//@"CREATE TABLE EventoOcorrencias (
+//     Id              INTEGER PRIMARY KEY AUTOINCREMENT
+//    ,IdEvento        INTEGER NOT NULL
+//    ,Codigo          VARCHAR(100)
+//    ,Descricao       VARCHAR(8000)
+//    ,Localizacao     VARCHAR(8000)
+//    ,TipoOcorrencia  INTEGER    
+//)");
+//            #endregion
 
             #region LogErros
             connection.Execute(
-@"CREATE TABLE LogErros (
+@"CREATE TABLE Erros (
      Id              INTEGER PRIMARY KEY AUTOINCREMENT
     ,Tipo            VARCHAR
     ,Mensagem        VARCHAR

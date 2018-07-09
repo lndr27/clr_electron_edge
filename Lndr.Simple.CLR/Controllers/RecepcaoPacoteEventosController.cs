@@ -1,5 +1,8 @@
-﻿using Lndr.Simple.CLR.Helpers.Extensions;
+﻿using Lndr.Simple.CLR.Helpers;
+using Lndr.Simple.CLR.Helpers.Exceptions;
+using Lndr.Simple.CLR.Helpers.Extensions;
 using Lndr.Simple.CLR.Models;
+using Lndr.Simple.CLR.Models.Dto;
 using Lndr.Simple.CLR.Models.Entities;
 using Lndr.Simple.CLR.Models.Enums;
 using Lndr.Simple.CLR.Repositories;
@@ -59,6 +62,60 @@ namespace Lndr.Simple.CLR.Controllers
                 File.WriteAllText(@"C:\\users\lndr2\desktop\log.txt", ex.Message + Environment.NewLine + ex.StackTrace);
                 throw;
             }
+        }
+
+        public async Task<object> AdicionarLotes(object input)
+        {
+            var service = new EventoService();
+            var data = DateTime.Now;
+
+            var arquivos = input.ToStringArray();
+            foreach (var caminhoArquivo in arquivos)
+            {
+                var arquivoEncriptado = File.ReadAllBytes(caminhoArquivo);
+                var arquivosEncriptadosBytes = new List<byte[]>();
+
+                if (arquivoEncriptado.IsZipFile())
+                {
+                    arquivosEncriptadosBytes.AddRange(arquivoEncriptado.UnzipAll());
+                }
+                else
+                {
+                    arquivosEncriptadosBytes.Add(arquivoEncriptado);
+                }
+
+                foreach (var arquivoEncriptadoBytes in arquivosEncriptadosBytes)
+                {
+                    if (!CryptographyHelper.IsHeaderValid(arquivoEncriptadoBytes, Resources.HeaderEFinanceira))
+                    {
+                        throw new ArquivoInvalidoException();
+                    }
+
+                    var arquivoDecriptado = CryptographyHelper.Decrypt(arquivoEncriptadoBytes, Resources.CryptoPrivateKey);
+                    var dadosArquivo = JsonConvert.DeserializeObject<ArquivoComunicacaoEFinanceiraDto>(arquivoDecriptado.GetString());
+
+                    var empresa = new Empresa
+                    {
+                        Entidade = dadosArquivo.Entidade,
+                        CNPJ = dadosArquivo.EntidadeCnpj,
+                        Nome = dadosArquivo.EntidadeNome
+                    };
+
+                    var lote = new EFinanceiraLote
+                    {
+                        DataAtualizacao = data,
+                        DataUpload = data,
+                        IdLote = dadosArquivo.LoteId,
+                        StatusEvento = (int)StatusEventoEnum.Novo,
+                        TipoEvento = dadosArquivo.TipoEventoId,
+                        XmlLote = dadosArquivo.LoteXmlBase64.FromBase64String()
+                    };
+
+                    service.AdicionarLote(empresa, lote);
+                }
+            }
+
+            return new { };
         }
 
         public async Task<object> ComecarEnvioLotesEmpresaAsync(int idEmpresa)

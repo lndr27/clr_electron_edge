@@ -39,5 +39,9 @@ namespace Lndr.Simple.CLR.Models.Entities
                 return ((StatusEventoEnum)this.StatusEvento).GetEnumDescription();
             }
         }
+
+        public int Ano { get; set; }
+
+        public int Semestre { get; set; }
     }
 }

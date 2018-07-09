@@ -9,17 +9,20 @@ namespace Lndr.Simple.CLR.Helpers
     public static class CryptographyHelper
     {
         #region Constants +
-        const int HEADER_LENGTH              = 50;
-        const int RSA_RESULT_LENGTH          = 128;
-        const int RSA_KEY_LENGTH             = 2048;
-        const int PASSWORD_RANDOM_ITERATIONS = 1000;
-        const int PASSWORD_LENGTH            = 64;
-        const int SALT_LENGTH                = 32;
+        public static readonly int HEADER_LENGTH              = 50;
+        public static readonly int RSA_RESULT_LENGTH          = 128;
+        public static readonly int RSA_KEY_LENGTH             = 2048;
+        public static readonly int PASSWORD_RANDOM_ITERATIONS = 1000;
+        public static readonly int PASSWORD_LENGTH            = 64;
+        public static readonly int SALT_LENGTH                = 32;
         #endregion
 
         #region Encryption +
         public static byte[] Encrypt(byte[] bytesToBeEncrypted, string publicKey)
         {
+            Guard.ForArgumentNull(bytesToBeEncrypted, "bytesToBeEncrypted");
+            Guard.ForArgumentNullOrEmpty(publicKey, "publicKey");
+
             return Encrypt(bytesToBeEncrypted, publicKey, string.Empty);
         }
 
@@ -81,6 +84,9 @@ namespace Lndr.Simple.CLR.Helpers
 
         private static byte[] RSA_Encryption(byte[] input, string publicKey)
         {
+            Guard.ForArgumentNull(input, "input");
+            Guard.ForArgumentNullOrEmpty(publicKey, "publicKey");
+
             using (var rsa = new RSACryptoServiceProvider(RSA_KEY_LENGTH))
             {
                 try
@@ -97,14 +103,27 @@ namespace Lndr.Simple.CLR.Helpers
         #endregion
 
         #region Decryption +
-        public static byte[] Decrypt(byte[] bytesToBeDecrypted, string privateKey)
+        public static bool IsHeaderValid(byte[] encryptedBytes, string header)
+        {
+            return GetHeader(encryptedBytes).IndexOf(header, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        public static string GetHeader(byte[] bytesToBeDecrypted)
         {
             var header = new byte[HEADER_LENGTH];
+            Buffer.BlockCopy(bytesToBeDecrypted, 0, header, 0, header.Length);
+            return header.GetString().Trim();
+        }
+
+        public static byte[] Decrypt(byte[] bytesToBeDecrypted, string privateKey)
+        {
+            Guard.ForArgumentNull(bytesToBeDecrypted, "bytesToBeDecrypted");
+            Guard.ForArgumentNullOrEmpty(privateKey, "privateKey");
+            
             var passwordBytesEncrypted = new byte[RSA_RESULT_LENGTH];
             var saltBytesEncrypted = new byte[RSA_RESULT_LENGTH];
             var encryptedData = new byte[bytesToBeDecrypted.Length - (RSA_RESULT_LENGTH * 2) - HEADER_LENGTH]; 
-
-            Buffer.BlockCopy(bytesToBeDecrypted, 0, header, 0, header.Length);
+            
             Buffer.BlockCopy(bytesToBeDecrypted, HEADER_LENGTH, passwordBytesEncrypted, 0, passwordBytesEncrypted.Length);
             Buffer.BlockCopy(bytesToBeDecrypted, HEADER_LENGTH + RSA_RESULT_LENGTH, saltBytesEncrypted, 0, saltBytesEncrypted.Length);
             Buffer.BlockCopy(bytesToBeDecrypted, HEADER_LENGTH + (RSA_RESULT_LENGTH * 2), encryptedData, 0, encryptedData.Length);
@@ -117,6 +136,11 @@ namespace Lndr.Simple.CLR.Helpers
 
         private static byte[] AES_Decrypt(byte[] bytesToBeDecrypted, byte[] passwordBytes, byte[] saltBytes, string privateKey)
         {
+            Guard.ForArgumentNull(bytesToBeDecrypted, "bytesToBeDecrypted");
+            Guard.ForArgumentNull(passwordBytes, "passwordBytes");
+            Guard.ForArgumentNull(saltBytes, "saltBytes");
+            Guard.ForArgumentNullOrEmpty(privateKey, "privateKey");
+
             using (var ms = new MemoryStream())
             {
                 using (var AES = new RijndaelManaged())
@@ -140,6 +164,9 @@ namespace Lndr.Simple.CLR.Helpers
 
         private static byte[] RSA_Decryption(byte[] bytesToDecrypt, string privateKey)
         {
+            Guard.ForArgumentNull(bytesToDecrypt, "bytesToDecrypt");
+            Guard.ForArgumentNullOrEmpty(privateKey, "privateKey");
+
             using (var rsa = new RSACryptoServiceProvider(RSA_KEY_LENGTH))
             {
                 try

@@ -12,8 +12,24 @@ namespace Lndr.Simple.CLR.Repositories
         {
             using (var connection = base.GetDbConnection())
             {
-                return connection.QueryFirst<Empresa>("SELECT * FROM Empresas WHERE CNPJ = @cnpj", new { cnpj });
+                return connection.QueryFirstOrDefault<Empresa>("SELECT * FROM Empresas WHERE CNPJ = @cnpj", new { cnpj });
             }
-        }       
+        }
+
+        public Empresa GetByEntidade(int entidade)
+        {
+            using (var connection = base.GetDbConnection())
+            {
+                return connection.QueryFirstOrDefault<Empresa>("SELECT * FROM Empresas WHERE Entidade = @entidade", new { entidade });
+            }
+        }
+
+        public bool EmpresaExists(int entidade)
+        {
+            using (var connection = base.GetDbConnection())
+            {
+                return connection.ExecuteScalar<bool>("SELECT 1 FROM Empresas WHERE Entidade = @entidade", new { entidade });
+            }
+        }
     }
 }

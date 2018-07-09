@@ -1,23 +1,15 @@
-﻿using Lndr.Simple.CLR.Models.Entities;
+﻿using Lndr.Simple.CLR.Helpers.Extensions;
+using Lndr.Simple.CLR.Models.Entities;
 using Lndr.Simple.CLR.Models.Enums;
-using Lndr.Simple.CLR.Repositories;
-using Lndr.Simple.CLR.Helpers.Extensions;
 using System;
 
-namespace Lndr.Simple.CLR.Services.Implementations
+namespace Lndr.Simple.CLR.Services
 {
-    class JobService
+    class JobService : BaseService, IJobService
     {
-        private readonly IJobRepository _jobRepository;
-
-        public JobService()
-        {
-            this._jobRepository = new JobRepository();
-        }
-
         public void ComecarJob(TipoJobEnum tipoJob, int idEmpresa)
         {
-            var job = this._jobRepository.GetByTipo((int)tipoJob, idEmpresa);
+            var job = base.JobRepository.GetByTipo((int)tipoJob, idEmpresa);
             if (job == null)
             {
                 job = new Job
@@ -26,7 +18,7 @@ namespace Lndr.Simple.CLR.Services.Implementations
                     IdEmpresa = idEmpresa,
                     StatusJob = (int)StatusJobEnum.Executando
                 };
-                this._jobRepository.Add(job);
+                base.JobRepository.Add(job);
 
             }
             else if (job.StatusJob.In(
@@ -38,19 +30,19 @@ namespace Lndr.Simple.CLR.Services.Implementations
                 job.StatusJob = (int)StatusJobEnum.Executando;
                 job.DataInicio = DateTime.Now;
                 job.DataAtualizacao = job.DataInicio;
-                this._jobRepository.Update(job);
+                base.JobRepository.Update(job);
             }
         }
 
         public StatusJobEnum GetStatusJob(TipoJobEnum tipojob, int idEmpresa)
         {
-            var job = this._jobRepository.GetByTipo((int)tipojob, idEmpresa);
+            var job = base.JobRepository.GetByTipo((int)tipojob, idEmpresa);
             return job != null ? (StatusJobEnum)job.StatusJob : StatusJobEnum.Inexistente;
         }
 
         public void AtualizarStatusJob(TipoJobEnum tipojob, int idEmpresa, StatusJobEnum status)
         {
-            var job = this._jobRepository.GetByTipo((int)tipojob, idEmpresa);
+            var job = base.JobRepository.GetByTipo((int)tipojob, idEmpresa);
             if (job != null)
             {
                 job.StatusJob = (int)status;
@@ -62,7 +54,7 @@ namespace Lndr.Simple.CLR.Services.Implementations
                 {
                     job.DataFim = job.DataAtualizacao;
                 }
-                this._jobRepository.Update(job);
+                base.JobRepository.Update(job);
             }
         }
     }

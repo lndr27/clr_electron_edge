@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lndr.Simple.CLR.Helpers.Extensions
 {
-    static class ObjectExtensions
+    public static class ObjectExtensions
     {
         public static string[] ToStringArray(this object obj)
         {

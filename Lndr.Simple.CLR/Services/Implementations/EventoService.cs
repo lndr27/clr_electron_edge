@@ -13,20 +13,24 @@ using Lndr.Simple.CLR.Helpers;
 
 namespace Lndr.Simple.CLR.Services
 {
-    class EventoService : IEventoService
+    class EventoService : BaseService, IEventoService
     {
-        #region Campos e Ctor +
-        private readonly JobService _jobService;
-
-        private readonly IEmpresaRepository _empresaRepository;
-
-        private readonly IEventoRepository _eventoRepository;
+        private IJobService _jobService;
 
         public EventoService()
         {
-            this._empresaRepository = new EmpresaRepository();
-            this._eventoRepository = new EventoRepository();
             this._jobService = new JobService();
+        }
+
+        #region EFinanceira
+        public void AdicionarLote(Empresa empresa, EFinanceiraLote lote)
+        {
+            empresa.Id = this.SalvarEmpresa(empresa);
+            lote.IdEmpresa = empresa.Id;
+            if (!base.EfinanceiraLoteRepository.LoteExists(lote.IdLote))
+            {
+                base.EfinanceiraLoteRepository.Add(lote);
+            }            
         }
         #endregion
 
@@ -38,10 +42,10 @@ namespace Lndr.Simple.CLR.Services
 
         public int SalvarEmpresa(Empresa empresa)
         {
-            var empresaBase = this._empresaRepository.GetByCnpj(empresa.CNPJ);
+            var empresaBase = base.EmpresaRepository.GetByEntidade(empresa.Entidade);
             if (empresaBase == null)
             {
-                return this._empresaRepository.Add(empresa);
+                return base.EmpresaRepository.Add(empresa);
             }
             return empresaBase.Id;
         }
@@ -53,10 +57,10 @@ namespace Lndr.Simple.CLR.Services
 
             foreach (var evento in eventos)
             {
-                var eventoBase = this._eventoRepository.GetByIdEvento(evento.IdEvento);
+                var eventoBase = base.EventoRespository.GetByIdEvento(evento.IdEvento);
                 if (eventoBase == null)
                 {
-                    this._eventoRepository.Add(new Evento
+                    base.EventoRespository.Add(new Evento
                     {
                         IdEmpresa              = idEmpresa,
                         DataUpload             = dataAtualizacao,
@@ -80,12 +84,12 @@ namespace Lndr.Simple.CLR.Services
             }
             this._jobService.ComecarJob(TipoJobEnum.Assinatura, idEmpresa);
 
-            var evento = this._eventoRepository.GetEventoNaoAssinados(idEmpresa);
+            var evento = base.EventoRespository.GetEventoNaoAssinados(idEmpresa);
             while (evento != null && StatusJobEnum.Executando == this._jobService.GetStatusJob(TipoJobEnum.Assinatura, idEmpresa))
             {
                 evento.XmlEvento = AssinadorXml.Assinar(evento.XmlEvento);
-                this._eventoRepository.Update(evento);
-                evento = this._eventoRepository.GetEventoNaoAssinados(idEmpresa);
+                base.EventoRespository.Update(evento);
+                evento = base.EventoRespository.GetEventoNaoAssinados(idEmpresa);
             }
             this._jobService.AtualizarStatusJob(TipoJobEnum.Assinatura, idEmpresa, StatusJobEnum.Concluido);
         }
